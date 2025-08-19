@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search Dashboard</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://bucket.mlcdn.com/a/3336/3336910/images/34fdb3a11cc4d64885c973054e27c8d9bc15f5a1.png">    
+    
+    <style>
+        /* Add this at the very top of your CSS */
+        html {
+            box-sizing: border-box;
+            overflow-x: hidden; /* Prevents horizontal scrolling */
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        :root {
+            --primary: #DF1783;
+            --primary-light: #f8a4d4;
+            --secondary: #2d3748;
+            --accent: #4fd1c5;
+            --text: #2d3748;
+            --text-light: #f7fafc;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-color: #e2e8f0;
+        }
+
+        .dark-mode {
+            --primary: #DF1783;
+            --primary-light: #4a1a38;
+            --secondary: #1e2837;
+            --accent: #4fd1c5;
+            --text: #f7fafc;
+            --text-light: #2d3748;
+            --bg: #1a202c;
+            --card-bg: #2d3748;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --border-color: #4a5568;
+        }
+        
+        .dark-mode .sidebar, .dark-mode .sidebar .nav-item, .dark-mode .sidebar .user-info {
+            color: #f7fafc;
+        }
+        
+        .dark-mode .sidebar .sidebar-toggle {
+            color: #f7fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        html { 
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--secondary);
+            color: var(--text-light);
+            padding: 20px 0;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar.collapsed { width: 70px; }
+        
+        .logo {
+            display: flex; 
+            align-items: left; 
+            padding: 10px 25px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            margin-bottom: 20px; position: relative;
+        }
+
+        .logo i { 
+            margin-right: 10px; 
+            color: var(--primary); 
+            min-width: 20px; /* Ensure consistent width */
+        }
+        
+        .logo h1 { font-size: 18px; font-weight: 600; white-space: nowrap; }
+        
+        .sidebar-toggle {
+            position: absolute; right: -12px; top: 5px; background: var(--primary);
+            color: white; border: none; border-radius: 50%; width: 24px; height: 24px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);
+        }
+        
+        .sidebar.collapsed .logo { justify-content: center; }
+        .sidebar.collapsed .logo h1 { display: none; }
+        .sidebar.collapsed .sidebar-toggle i { transform: rotate(180deg); }
+        
+        .sidebar .nav-item span, .sidebar .user-name, .sidebar .theme-text {
+            white-space: nowrap; opacity: 1; transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .nav-item span, .sidebar.collapsed .user-name, .sidebar.collapsed .theme-text {
+            opacity: 0; display: none;
+        }
+        
+        .sidebar.collapsed .nav-item { 
+            justify-content: center; 
+        }
+        
+        .sidebar.collapsed .nav-item i { 
+            margin-right: 0; 
+            color: var(--text-light); /* Ensure icons are visible in both modes */
+        }
+        
+        .nav-menu { flex: 1; overflow-y: auto; }
+        
+        .nav-item { 
+            padding: 15px 20px; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer; 
+            border-left: 3px solid transparent; 
+        }
+        
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.05); }
+        
+        .nav-item.active { background-color: rgba(255, 255, 255, 0.1); border-left-color: var(--primary); }
+        
+        .nav-item i { 
+            margin-right: 12px; 
+            width: 20px; 
+            text-align: center; 
+            color: var(--text-light); /* Ensure icons are visible */
+        }
+
+        .user-section { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .user-info { display: flex; align-items: center; }
+        
+        .sidebar.collapsed .user-info { justify-content: center; }
+        
+        .sidebar.collapsed .user-info > div:not(.user-avatar) { display: none; }
+
+        .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary);
+            display: flex; align-items: center; justify-content: center; margin-right: 10px;
+            color: white; font-weight: bold; flex-shrink: 0; overflow: hidden;
+        }
+        
+        .sidebar.collapsed .user-avatar { margin-right: 0; }
+        .user-name { font-weight: 600; }
+        .user-id-text { font-size: 11px; color: rgba(255, 255, 255, 0.6); line-height: 1.2; }
+
+        .theme-toggle {
+            display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-top: 20px;
+            padding: 8px 12px; background-color: rgba(255, 255, 255, 0.1); border-radius: 20px; cursor: pointer;
+        }
+        
+        .sidebar.collapsed .theme-toggle { justify-content: center; }
+        .sidebar.collapsed .theme-toggle .theme-text { display: none; }
+        #themeIcon { font-size: 20px; }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1; 
+            margin-left: 250px; 
+            padding: 40px; 
+            padding-bottom: 10px; 
+            transition: margin-left 0.3s ease; 
+            background-color: var(--bg);
+            min-height: calc(100vh - 20px); /* Adjusted for better footer spacing */
+        }
+        
+        .main-content.sidebar-collapsed { margin-left: 70px; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 40px; 
+        }
+        
+        .greeting h2 { 
+            font-size: 28px; 
+            font-weight: 600; 
+            margin-bottom: 5px; /* Added to reduce space between title and greeting */
+        }
+        
+        .greeting p { 
+            color: var(--primary); 
+            font-weight: 500; 
+            margin-top: 5px; 
+        }
+        
+        .header-right { display: flex; align-items: center; gap: 20px; }
+
+        .header-widget {
+            display: flex; align-items: center; background-color: var(--card-bg);
+            padding: 10px 15px; border-radius: 8px; box-shadow: var(--shadow);
+        }
+
+        .live-clock .time { font-weight: 600; font-size: 14px; margin-right: 8px; }
+        .live-clock .date { font-size: 14px; color: var(--primary); }
+
+        .search-bar { width: 300px; }
+        .search-bar input { border: none; background: transparent; outline: none; flex: 1; color: var(--text); }
+        .search-bar i { color: var(--primary); margin-right: 10px; }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-bottom: 40px;
+        }
+        
+        .card { 
+            background-color: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 25px; 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        
+        .card-title { font-weight: 600; font-size: 16px; }
+        .card-value { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+        .card-text { color: var(--primary); font-size: 14px; }
+        .progress-bar { height: 8px; background-color: rgba(223, 23, 131, 0.2); border-radius: 4px; margin-top: auto; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: var(--primary); border-radius: 4px; width: 0%; }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr; /* Mobile-first single column */
+            gap: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden; /* Prevents any overflow issues */
+        }
+
+        .chart-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            height: auto; /* Flexible height */
+            min-height: 300px; /* Minimum height */
+            width: 100%;
+            overflow: hidden; /* Ensures content stays within bounds */
+        }
+
+        /* Medium screens (tablets) and up */
+        @media (min-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr 1fr; /* Equal columns on medium screens */
+                gap: 25px;
+            }
+        }
+
+        /* Large screens (desktops) and up */
+        @media (min-width: 1024px) {
+            .charts-section {
+                grid-template-columns: 2fr 1fr; /* Wider left column on large screens */
+                gap: 30px;
+                margin-bottom: 40px;
+            }
+            
+            .chart-container {
+                padding: 25px;
+                height: 350px; /* Fixed height only on large screens */
+            }
+        }
+
+        /* Extra safety to prevent overflow */
+        .chart-container canvas,
+        .chart-container svg {
+            max-width: 100%;
+            height: auto !important; /* Override any inline chart library styles */
+        }
+        
+        /* Sections */
+        .activity-section, .list-section { 
+            background-color: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 30px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; /* Added for better spacing */
+        }
+        
+        .activity-item, .list-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 20px 10px; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        
+        .activity-item:last-child, .list-item:last-child { border-bottom: none; }
+        
+        .activity-icon, .list-icon {
+            width: 40px; height: 40px; border-radius: 50%; background-color: rgba(223, 23, 131, 0.1);
+            display: flex; align-items: center; justify-content: center; margin-right: 20px; color: var(--primary); flex-shrink: 0;
+        }
+        
+        .activity-content, .list-content { flex: 1; }
+        .activity-title, .list-title { font-weight: 600; margin-bottom: 5px; }
+        .activity-time, .list-meta { font-size: 12px; color: #718096; }
+        .dark-mode .activity-time, .dark-mode .list-meta { color: #a0aec0; }
+        
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .badge-primary { background-color: #3B82F6; color: white; } .badge-info { background-color: #4FD1C5; color: white; }
+        .badge-success { background-color: #38B2AC; color: white; } .badge-danger { background-color: #EF4444; color: white; }
+        .badge-secondary { background-color: #6B7280; color: white; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg); padding: 40px; border-radius: 10px; width: 500px; max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); max-height: 90vh; overflow-y: auto;
+        }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-title { font-size: 22px; font-weight: 600; }
+        .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px;
+            background-color: var(--bg); color: var(--text);
+        }
+        
+        .dark-mode .form-group input, .dark-mode .form-group select, .dark-mode .form-group textarea {
+             background-color: var(--secondary);
+        }
+        
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .modal-footer { display: flex; justify-content: flex-end; margin-top: 30px; gap: 10px; }
+        
+        .form-group-inline { display: flex; align-items: center; gap: 10px; margin-top: 15px;}
+
+        /* Buttons */
+        .btn { padding: 12px 24px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        
+        .btn-primary { background-color: var(--primary); color: white; }
+        
+        .btn-primary:hover { background-color: #c4126e; }
+        
+        .btn-secondary { background-color: #e2e8f0; color: var(--text); }
+        .dark-mode .btn-secondary { background-color: #4a5568; color: var(--text); }
+        
+        .btn-secondary:hover { background-color: #cbd5e0; }
+        .dark-mode .btn-secondary:hover { background-color: #718096; }
+        
+        .add-button {
+            background-color: var(--primary); color: white; padding: 12px 20px; border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 600; box-shadow: var(--shadow); transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-button:hover { background-color: #c4126e; }
+        
+        /* Page Styles */
+        .page-content { display: none; min-height: 100%; flex-direction: column; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header h2 { font-size: 28px; font-weight: 600; }
+        
+        /* Templates Section */
+        #templatesContent .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .template-card {
+            background-color: var(--card-bg); border-radius: 10px; padding: 25px;
+            box-shadow: var(--shadow); display: flex; flex-direction: column;
+        }
+        
+        .template-card h4 { font-weight: 600; margin-bottom: 10px; }
+        .template-card p {
+            font-size: 14px; color: #718096; margin-bottom: 20px; white-space: pre-wrap;
+            line-height: 1.7; flex-grow: 1;
+        }
+        
+        .dark-mode .template-card p { color: #a0aec0; }
+        .template-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .template-actions .btn { font-size: 12px; padding: 8px 12px; }
+
+        /* Calendar */
+        .calendar-container { background-color: var(--card-bg); padding: 25px; border-radius: 10px; box-shadow: var(--shadow); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .calendar-nav-btn { background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: var(--border-color); border: 1px solid var(--border-color); }
+        .calendar-day-header, .calendar-day { padding: 10px; text-align: center; background-color: var(--card-bg); min-height: 120px; position: relative; }
+        .calendar-day-header { background-color: var(--accent); color: var(--text-light); font-weight: 600; min-height: auto; }
+        .calendar-event {
+            background-color: var(--primary-light); color: var(--secondary); border-radius: 4px; font-size: 12px;
+            padding: 2px 5px; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: pointer;
+        }
+        
+        .dark-mode .calendar-event { color: var(--text); }
+        .calendar-day-number { font-weight: bold; font-size: 1.2em; position: absolute; top: 5px; left: 5px; }
+        
+        /* Calendar Export Buttons */
+        .calendar-export {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .calendar-export button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .calendar-export .google-btn {
+            background-color: #4285F4;
+            color: white;
+        }
+        
+        .calendar-export .ical-btn {
+            background-color: #34A853;
+            color: white;
+        }
+        
+        /* Profile Picture Upload */
+        .profile-pic-upload { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .profile-pic-preview { width: 100px; height: 100px; border-radius: 50%; background: #e2e8f0; border: 2px dashed var(--primary);
+            display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .profile-pic-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-pic-preview i { color: var(--primary); }
+        
+        /* Notification Banner */
+        .notification-banner {
+            display: none; padding: 15px; margin-bottom: 20px; border-radius: 8px;
+            background-color: #fefcbf; border: 1px solid #fbd38d; color: #b7791f;
+            align-items: center; justify-content: space-between;
+        }
+        
+        .dark-mode .notification-banner {
+             background-color: #4a370e; border-color: #a0742f; color: #fbd38d;
+        }
+        
+        /* Goal Notification */
+        .goal-notification {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .goal-notification.show {
+            display: block;
+            animation: slideIn 0.5s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .goal-notification .close-notification {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            background: transparent;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 12px;
+            width: 100%;
+            border-radius: 7px;
+            z-index: 10;
+            margin: 0 auto;
+            max-width: 820px;
+        }
+
+        .social-links-container {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto; /* Allows horizontal scrolling if absolutely needed */
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        .social-links {
+            margin-top: 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0;
+            flex-wrap: wrap;
+            padding: 0.25rem;
+            min-width: min-content; /* Prevents unwanted shrinking */
+        }
+
+        .social-link {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            background: #2d3748;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            white-space: nowrap; /* Prevents text from breaking */
+            min-width: max-content; /* Ensures minimum width based on content */
+        }
+
+        .social-link:hover {
+            color: var(--text);
+            background: #1e2837;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .bebell-footer {
+            padding: 20px;
+        }
+
+        .bebell-footer p {
+            align-items: center;
+            text-align: center;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .bebell-link {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .bebell-link:hover {
+            color: #df1783;
+        }
+        
+        [data-theme="dark"] .footer {
+            background: inherit;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] .social-link {
+            background: var(--card);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .social-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* CV Upload Controls */
+        .cv-upload-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .cv-upload-controls .btn {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        /* Reset Button */
+        .reset-btn {
+            background-color: #EF4444;
+            color: white;
+            margin-top: 30px;
+            /* FIX: Added flex properties for icon alignment */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .reset-btn:hover {
+            background-color: #DC2626;
+        }
+
+        /* Improved responsive breakpoints */
+        @media (max-width: 1200px) { 
+            .dashboard-cards { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 20px;
+            } 
+            .charts-section {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 992px) { 
+            .charts-section { 
+                grid-template-columns: 1fr; 
+            } 
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0; /* Remove default body padding */
+            }
+            .main-content { 
+                padding: 15px; 
+                width: 100%;
+                max-width: 100%;
+                margin-left: 0; /* Sidebar will overlay or be hidden */
+            }
+            .sidebar {
+                /* Example: Make sidebar overlay on mobile */
+                position: fixed;
+                left: -250px;
+                transition: left 0.3s ease;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .main-content.sidebar-collapsed {
+                margin-left: 0;
+            }
+            .header { 
+                flex-direction: column; 
+                align-items: stretch; /* Changed from flex-start to stretch */
+                gap: 15px; 
+                padding: 15px;
+            }
+            .header-right { 
+                width: 100%; 
+                flex-direction: column; 
+                gap: 15px; 
+            }
+            .search-bar, .live-clock { 
+                width: 100%; 
+                max-width: 100%;
+            }
+            .dashboard-cards { 
+                grid-template-columns: 1fr; 
+            }
+            /* Add this to ensure containers don't overflow */
+            .card, .chart-container, .activity-section, .list-section {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) { 
+            .modal-content { 
+                max-width: 95%; 
+                padding: 20px; 
+                margin: 20px auto; /* Center the modal */
+            }
+            /* Add mobile-specific adjustments */
+            .card {
+                padding: 15px;
+            }
+            .activity-item, .list-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .activity-icon, .list-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .calendar-export {
+                flex-direction: column;
+            }
+        }
+
+        /* Add this to prevent any element from causing overflow */
+        .container, .main-content, header, section {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+           <span style="margin-right: 10px; display: inline-flex; color: #df1783;"> <i data-lucide="briefcase"></i></span>
+            <h1>Job Search Panel</h1>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i data-lucide="chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="navigateTo('dashboardContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;">                      
+                    <i data-lucide="layout-dashboard"></i>
+                </span>
+                <span>Dashboard</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('applicationsContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;">      
+                    <i data-lucide="file-text"></i>
+                </span>
+                <span>Applications</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('companiesContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;">       
+                    <i data-lucide="building-2"></i>
+                </span>
+                <span>Companies</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('iframePage', this, 'https://bebell-digital-solutions.github.io/job-search-directory/en-v02')">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="contact"></i>
+                </span>
+                <span>Directory</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('calendarContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="calendar-days"></i>
+                </span>
+                <span>Calendar</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('templatesContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="layout-list"></i>
+                </span>
+                <span>Templates</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('iframePage', this, 'https://example.com/preparation')">
+                <span style="margin-right: 10px; display: inline-flex;">        
+                    <i data-lucide="book-open-text"></i>
+                </span>
+                <span>Preparation</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('iframePage', this, 'https://example.com/tools')">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="wrench"></i>
+                </span>
+                <span>Useful Tools</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('curriculumContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="file-check-2"></i>
+                </span>
+                <span>Curriculum</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('iframePage', this, 'https://example.com/photoshoot')">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="camera"></i>
+                </span>
+                <span>Photoshoot</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('iframePage', this, 'https://bebell-digital-solutions.github.io/aica-deepseek')">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="bot"></i>
+                </span>
+                <span>AI Assistant</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('settingsContent', this)">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="settings"></i>
+                </span>
+                <span>Settings</span>
+            </div>
+            
+            <div class="nav-item" onclick="navigateTo('iframePage', this, 'https://example.com/help')">
+                <span style="margin-right: 10px; display: inline-flex;"> 
+                    <i data-lucide="help-circle"></i>
+                </span>
+                <span>Help Center</span>
+            </div>
+        </div>
+        
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">
+                    <i data-lucide="user-circle-2"></i> 
+                </div>
+              
+                <div>
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-id-text">ID: <span id="userIdDisplay">...</span></div>
+                </div>
+            </div>
+            
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <i data-lucide="moon" id="themeIcon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <div class="greeting">
+                <h2 id="pageTitle">Dashboard</h2>
+                <p>Hello, <span id="greetingName">User</span>!</p>
+            </div>
+            <div class="header-right">
+                <div class="live-clock header-widget">
+                    <div id="liveTime" class="time"></div>
+                    <div id="liveDate" class="date"></div>
+                </div>
+                <div class="search-bar header-widget">
+                    <i data-lucide="search" style="width: 20px; height: 20px;"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Goal Notification -->
+        <div class="goal-notification" id="goalNotification">
+            <button class="close-notification" onclick="closeGoalNotification()">
+                <i data-lucide="x"></i>
+            </button>
+            <div id="goalNotificationContent"></div>
+        </div>
+        
+        <div id="dashboardContent" class="page-content" style="display: flex;">
+            <div style="flex-grow: 1;">
+                <div class="dashboard-cards">
+                    <div class="card"><div class="card-header"><div class="card-title">Applications</div><i data-lucide="file-text" style="color: var(--primary);"></i></div><div class="card-value" id="totalApplications">0</div><div class="card-text">Monthly Goal</div><div class="progress-bar"><div class="progress-fill" id="applicationsProgress"></div></div></div>
+                    <div class="card"><div class="card-header"><div class="card-title">Interviews</div><i data-lucide="message-square" style="color: var(--accent);"></i></div><div class="card-value" id="totalInterviews">0</div><div class="card-text">Total scheduled</div><div class="progress-bar"><div class="progress-fill" id="interviewsProgress" style="background-color: var(--accent);"></div></div></div>
+                    <div class="card"><div class="card-header"><div class="card-title">Offers</div><i data-lucide="handshake" style="color: var(--accent);"></i></div><div class="card-value" id="totalOffers">0</div><div class="card-text">Pending acceptance</div><div class="progress-bar"><div class="progress-fill" id="offersProgress" style="background-color: var(--accent);"></div></div></div>
+                    <div class="card"><div class="card-header"><div class="card-title">Rejected</div><i data-lucide="x-circle" style="color: #EF4444;"></i></div><div class="card-value" id="totalRejected">0</div><div class="card-text">Learning opportunities</div><div class="progress-bar"><div class="progress-fill" id="rejectedProgress" style="background-color: #EF4444;"></div></div></div>
+                </div>
+                <div class="charts-section"><div class="chart-container"><canvas id="applicationsChart"></canvas></div><div class="chart-container"><canvas id="progressChart"></canvas></div></div>
+                <div class="activity-section"><div class="card-header"><div class="card-title">Recent Activity</div><i data-lucide="bell" style="color: var(--primary);"></i></div><div id="recentActivityList"><div class="list-item"><div class="list-content" style="text-align: center; width: 100%;">No recent activity yet.</div></div></div></div>
+            </div>
+        </div>
+        
+        <div id="applicationsContent" class="page-content"><div class="page-header"><h2>My Applications</h2><button class="add-button" onclick="showAddApplicationModal()"><i data-lucide="plus"></i> Add New</button></div><div class="list-section"><div id="applicationsList" class="list-container"><div class="list-item"><div class="list-content" style="text-align: center; width: 100%;">Loading applications...</div></div></div></div></div>
+        
+        <div id="companiesContent" class="page-content"><div class="page-header"><h2>My Companies</h2><button class="add-button" onclick="showAddCompanyModal()"><i data-lucide="plus"></i> Add New</button></div><div class="list-section"><div id="companiesList" class="list-container"><div class="list-item"><div class="list-content" style="text-align: center; width: 100%;">Loading companies...</div></div></div></div></div>
+        
+        <div id="calendarContent" class="page-content">
+            <div class="page-header"><h2>Application Calendar</h2></div>
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="calendar-nav-btn" onclick="prevMonth()"><i data-lucide="chevron-left"></i></button>
+                    <h3 id="currentMonthYear"></h3>
+                    <button class="calendar-nav-btn" onclick="nextMonth()"><i data-lucide="chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+                <div class="calendar-export">
+                    <button class="google-btn" onclick="exportToGoogleCalendar()">
+                        <i data-lucide="calendar-plus"></i>
+                        Export to Google
+                    </button>
+                    <button class="ical-btn" onclick="exportToICal()">
+                        <i data-lucide="download"></i>
+                        Download iCal
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="templatesContent" class="page-content"><div class="page-header"><h2>Application Templates</h2><button id="addTemplateBtn" class="add-button" onclick="addTemplate()"><i data-lucide="plus"></i> Add New</button></div><div class="list-section"><p style="margin-bottom: 20px;">Edit the cold message templates to use in your applications. You can have up to 10 templates.</p><div id="templatesList" class="card-container"></div></div></div>
+        
+        <div id="curriculumContent" class="page-content">
+            <div class="page-header"><h2>My Curriculum Vitae</h2></div>
+            <div class="list-section">
+                <p>Upload your CV here for easy access and preview.</p>
+                <div class="form-group">
+                    <label for="curriculumFile" class="btn btn-primary">
+                        <i data-lucide="upload" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> 
+                        Upload CV (PDF)
+                    </label>
+                    <input type="file" id="curriculumFile" accept=".pdf" onchange="handleCurriculumUpload(event)" style="display: none;">
+                    <span id="curriculumFileName" style="margin-left: 15px; font-style: italic;">No file selected.</span>
+                </div>
+                <div class="cv-upload-controls" id="cvControls" style="display: none;">
+                    <button class="btn btn-secondary" onclick="deleteCurriculum()">
+                        <i data-lucide="trash-2"></i> Delete CV
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('curriculumFile').click()">
+                        <i data-lucide="refresh-cw"></i> Replace CV
+                    </button>
+                </div>
+                <div id="cvPreview" style="margin-top: 20px; border: 1px solid var(--border-color); height: 600px;">
+                    <p style="padding: 20px; text-align: center; margin-top: 40%;">PDF Preview will appear here.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="settingsContent" class="page-content">
+            <div class="page-header"><h2>User Settings</h2></div>
+               <div class="notification-banner" id="cvNotificationBanner">
+                   <span>Your Curriculum Vitae is missing. Upload it for easy applications.</span>
+                   <button class="btn btn-primary" style="padding: 8px 12px;" onclick="navigateTo('curriculumContent', document.querySelector('[onclick*=\'curriculumContent\']'))">Upload CV</button>
+             </div>
+            <div class="list-section">
+                <form id="settingsForm">
+                    <div class="profile-pic-upload form-group">
+                        <div class="profile-pic-preview" id="settingsProfilePicPreview"><i data-lucide="user-circle-2"></i></div>
+                        <label for="settingsProfilePic" class="btn btn-secondary">Change Photo</label>
+                        <input type="file" id="settingsProfilePic" accept="image/*" style="display:none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="userFirstName">Full Name</label>
+                        <input type="text" id="userFirstName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="userDob">Date of Birth</label>
+                        <input type="date" id="userDob">
+                    </div>
+                    <div class="form-group">
+                        <label for="userJobTitle">Job Title</label>
+                        <input type="text" id="userJobTitle" placeholder="Enter your job title">
+                    </div>
+                    <div class="form-group">
+                        <label for="userGoal">Daily Application Goal</label>
+                        <input type="number" id="userGoal" placeholder="5">
+                    </div>
+                    <div class="modal-footer" style="margin-top: 0; padding-right: 0;">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+                
+                <div class="form-group">
+                    <!-- FIX: Changed onclick to correct function name -->
+                    <button class="btn reset-btn" onclick="resetAllData()">
+                        <i data-lucide="trash-2"></i> Reset All Data
+                    </button>
+                    <p style="font-size: 12px; margin-top: 10px; color: #718096;">
+                        Warning: This will delete all your data and reset the application to default settings.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="iframePage" class="page-content" style="height: calc(100vh - 150px); padding: 0;">
+            <iframe id="contentIframe" style="width:100%; height:90%; border:0; border-radius: 10px;" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+
+        <!-- Footer -->
+        <div class="social-links">
+            <a href="https://bebell-digital-solutions.github.io/checklist-creator/" class="social-link" rel="noopener noreferrer" target="_blank">
+                <span>☑️</span> Checklist Creator
+            </a>
+            <a href="https://bebell-digital-solutions.github.io/tasks-manager/en-v03" class="social-link" rel="noopener noreferrer" target="_blank">
+                <span>🎯</span> Tasks Manager
+            </a>
+            <a href="https://bebell-digital-solutions.github.io/bookmark-page/en-v03" class="social-link" rel="noopener noreferrer" target="_blank">
+                <span>🔗</span> Links Manager
+            </a>
+            <a href="https://bebell-digital-solutions.github.io/magic-toolbox-database/en-v03" class="social-link" rel="noopener noreferrer" target="_blank">
+                <span>🧰</span> Magic Toolbox
+            </a>
+            <a href="mailto:soporte@bebelldigitalsolutions.com" class="social-link"  rel="noopener noreferrer" target="_blank">
+                <span>📨</span> Tech Support
+            </a>
+        </div>
+
+        <div class="bebell-footer">
+            <p>Powered with 💖 by  
+                <a href="https://bebelldigitalsolutions.com" class="bebell-link">
+                    Bebell Digital Solutions.
+                </a><br>
+                <a id="copyrightYear"> © 2024 • All rights reserved.</a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="setupModal">
+        <div class="modal-content"><div class="modal-header"><div class="modal-title">Welcome! Let's Get You Set Up</div></div><p style="margin-bottom: 20px; font-size: 14px; color: #718096;">Provide your info to personalize your dashboard.</p><form id="setupForm"><div class="profile-pic-upload form-group"><div class="profile-pic-preview" id="setupProfilePicPreview"><i data-lucide="camera"></i></div><label for="setupProfilePic" class="btn btn-secondary">Upload Photo</label><input type="file" id="setupProfilePic" accept="image/*" style="display:none;"></div><div class="form-group"><label for="setupFirstName">Full Name</label><input type="text" id="setupFirstName" placeholder="Your full name" required></div><div class="form-group"><label for="setupJobTitle">Job Title</label><input type="text" id="setupJobTitle" placeholder="e.g., Software Engineer"></div><div class="form-group"><label for="setupDob">Date of Birth</label><input type="date" id="setupDob" required></div><div class="modal-footer"><button type="submit" class="btn btn-primary">Start Job Search</button></div></form></div>
+    </div>
+    
+    <div class="modal" id="addCompanyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add New Company</div>
+                <button class="close-modal" onclick="closeModal('addCompanyModal')">&times;</button>
+            </div>
+            <form id="addCompanyForm">
+                <div class="form-group">
+                    <label for="companyName">Company Name</label>
+                    <input type="text" id="companyName" required>
+                </div>
+                <div class="form-group">
+                    <label for="companyContactName">Contact Name (HR/Recruiter)</label>
+                    <input type="text" id="companyContactName">
+                </div>
+                <div class="form-group">
+                    <label for="companyEmail">Email Address</label>
+                    <input type="email" id="companyEmail">
+                </div>
+                <div class="form-group">
+                    <label for="companyContact">Contact Number</label>
+                    <input type="text" id="companyContact">
+                </div>
+                <div class="form-group">
+                    <label for="companyPosition">Position Available</label>
+                    <input type="text" id="companyPosition">
+                </div>
+                <div class="form-group">
+                    <label for="companyNotes">Notes</label>
+                    <textarea id="companyNotes"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCompanyModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Company</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="addApplicationModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Add New Application</div><button class="close-modal" onclick="closeModal('addApplicationModal')">&times;</button></div><form id="addApplicationForm"><div class="form-group"><label for="applicationCompany">Select Company</label><select id="applicationCompany" required onchange="populateCompanyData()"><option value="">-- Select a company --</option></select></div><div class="form-group"><label for="applicationPosition">Position Title</label><input type="text" id="applicationPosition" required></div><div class="form-group"><label for="applicationDate">Application Date</label><input type="date" id="applicationDate" required></div><div class="form-group"><label for="applicationStatus">Status</label><select id="applicationStatus" required><option value="Applied">Applied</option><option value="Interviewing">Interviewing</option><option value="Offer">Offer</option><option value="Rejected">Rejected</option></select></div><div class="form-group"><label for="applicationMessage">Cold Message Template</label><select id="applicationMessage" onchange="updateMessageText()"></select></div><div class="form-group"><label for="applicationSubject">Email Subject</label><input type="text" id="applicationSubject" placeholder="e.g., Application for Software Engineer"></div><div class="form-group"><label for="applicationMessageText">Message Content</label><textarea id="applicationMessageText"></textarea></div><div class="form-group-inline"><input type="checkbox" id="attachCvCheckbox"><label for="attachCvCheckbox">Attach Curriculum PDF</label></div><div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="closeModal('addApplicationModal')">Cancel</button><button type="submit" class="btn btn-primary">Save & Send</button></div></form></div></div>
+    
+    <div class="modal" id="templateEditModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">Edit Template</div><button class="close-modal" onclick="closeModal('templateEditModal')">&times;</button></div><form id="templateEditForm"><input type="hidden" id="editTemplateIndex"><div class="form-group"><label for="editTemplateTitle">Title</label><input type="text" id="editTemplateTitle" required></div><div class="form-group"><label for="editTemplateContent">Content</label><textarea id="editTemplateContent" required rows="6"></textarea></div><div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="closeModal('templateEditModal')">Cancel</button><button type="submit" class="btn btn-primary">Save Template</button></div></form></div></div> 
+    
+    <!-- FIX: Added a confirmation modal for the reset action -->
+    <div class="modal" id="confirmResetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Are you sure?</div>
+                <button class="close-modal" onclick="closeModal('confirmResetModal')">&times;</button>
+            </div>
+            <p>This action will permanently delete all your applications, companies, and settings. This cannot be undone.</p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmResetModal')">Cancel</button>
+                <button type="button" class="btn reset-btn" style="margin-top: 0;" onclick="executeReset()">Confirm Reset</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // --- Global State & Config ---
+        let myApplicationsChart, myProgressChart = null;
+        let currentMonth = new Date().getMonth(), currentYear = new Date().getFullYear();
+        let appData = { settings: null, applications: [], companies: [], };
+        let lastGoalNotificationDate = null;
+
+        // --- Local Storage Utilities ---
+        const saveData = () => localStorage.setItem('jobDashData', JSON.stringify(appData));
+        const loadData = () => {
+            const data = localStorage.getItem('jobDashData');
+            if (data) {
+                const parsedData = JSON.parse(data);
+                return {
+                    settings: parsedData.settings || null,
+                    applications: parsedData.applications || [],
+                    companies: parsedData.companies || [],
+                };
+            }
+            return { settings: null, applications: [], companies: [] };
+        };
+
+        // --- Core App & UI Logic ---
+        window.navigateTo = (contentId, navElement, iframeUrl = '') => {
+            document.querySelectorAll('.page-content').forEach(c => c.style.display = 'none');
+            
+            if (iframeUrl) {
+                const iframePage = document.getElementById('iframePage');
+                const iframe = document.getElementById('contentIframe');
+                if (iframePage && iframe) {
+                    if (iframe.src !== iframeUrl) iframe.src = iframeUrl;
+                    iframePage.style.display = 'block';
+                }
+            } else {
+                const contentDiv = document.getElementById(contentId);
+                if (contentDiv) contentDiv.style.display = 'flex';
+            }
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if(navElement) navElement.classList.add('active');
+            const pageTitle = navElement.querySelector('span:last-child')?.textContent || 'Dashboard';
+            document.getElementById('pageTitle').textContent = pageTitle;
+
+            // Handle specific page load logic
+            if (contentId === 'settingsContent') {
+                document.getElementById('cvNotificationBanner').style.display = appData.settings?.cvFile ? 'none' : 'flex';
+            }
+        }
+
+        window.toggleTheme = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            themeIcon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+            lucide.createIcons();
+            
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            if (appData.applications.length > 0) updateCharts(appData.applications); // Re-render charts for new theme
+        }
+
+        window.toggleSidebar = () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
+            
+            // This forces charts to re-render after sidebar animation, fixing potential resizing issues.
+            setTimeout(() => {
+                if (myApplicationsChart) myApplicationsChart.resize();
+                if (myProgressChart) myProgressChart.resize();
+            }, 300);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateString = now.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: 'numeric' });
+            document.getElementById('liveTime').textContent = timeString;
+            document.getElementById('liveDate').textContent = dateString;
+            
+            // Check daily goal at 8 PM if not already notified today
+            if (now.getHours() === 20 && (!lastGoalNotificationDate || lastGoalNotificationDate.getDate() !== now.getDate())) {
+                checkDailyGoal();
+            }
+        }
+
+        window.closeModal = (modalId) => document.getElementById(modalId).style.display = 'none';
+
+        // --- Onboarding and Settings ---
+        function showSetupModal() { document.getElementById('setupModal').style.display = 'flex'; }
+        
+        function loadSettingsPage() {
+            const settings = appData.settings || {};
+            document.getElementById('userFirstName').value = settings.fullName || '';
+            document.getElementById('userJobTitle').value = settings.jobTitle || '';
+            document.getElementById('userGoal').value = settings.dailyGoal || '5';
+            document.getElementById('userDob').value = settings.dob || '';
+            
+            const preview = document.getElementById('settingsProfilePicPreview');
+            preview.innerHTML = settings.profilePicture ? `<img src="${settings.profilePicture}" alt="Profile Preview">` : '<i data-lucide="user-circle-2"></i>';
+            lucide.createIcons();
+        }
+        
+        function handleProfilePicUpload(fileInput, callback) {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => callback(e.target.result);
+                reader.readAsDataURL(file);
+            } else {
+                callback(null);
+            }
+        }
+        
+        function saveSetup(event) {
+            event.preventDefault();
+            handleProfilePicUpload(document.getElementById('setupProfilePic'), (picData) => {
+                const userId = `user-${Date.now().toString().slice(-6)}`;
+                appData.settings = {
+                    userId: userId,
+                    fullName: document.getElementById('setupFirstName').value,
+                    jobTitle: document.getElementById('setupJobTitle').value,
+                    dob: document.getElementById('setupDob').value,
+                    dailyGoal: 5,
+                    profilePicture: picData,
+                    coldMessages: getDefaultTemplates()
+                };
+                saveData();
+                closeModal('setupModal');
+                initApp();
+            });
+        }
+        
+        function saveSettings(event) {
+            event.preventDefault();
+            handleProfilePicUpload(document.getElementById('settingsProfilePic'), (picData) => {
+                const newSettings = {
+                    ...appData.settings,
+                    fullName: document.getElementById('userFirstName').value,
+                    jobTitle: document.getElementById('userJobTitle').value,
+                    dailyGoal: parseInt(document.getElementById('userGoal').value) || 5,
+                    dob: document.getElementById('userDob').value,
+                };
+                if (picData) newSettings.profilePicture = picData;
+                appData.settings = newSettings;
+                saveData();
+                loadUserDataFromDB(appData.settings);
+                showNotification('Settings saved successfully!', 'success');
+            });
+        }
+        
+        // FIX: Replaced window.confirm with a custom modal
+        window.resetAllData = () => {
+            document.getElementById('confirmResetModal').style.display = 'flex';
+        }
+
+        // FIX: Created a new function to handle the actual reset logic
+        window.executeReset = () => {
+            localStorage.removeItem('jobDashData');
+            appData = { settings: null, applications: [], companies: [] };
+            closeModal('confirmResetModal');
+            // We need to clear the UI before showing the setup modal
+            document.body.innerHTML = ''; // A bit drastic, but effective. A reload is better.
+            window.location.reload();
+        }
+        
+        // --- Data Display and Rendering ---
+        function updateDashboardStats(applications) {
+            const statusCounts = applications.reduce((acc, app) => ({...acc, [app.status]: (acc[app.status] || 0) + 1 }), {});
+            const totalApps = applications.length;
+            const dailyGoal = appData.settings?.dailyGoal || 5;
+            
+            // FIX: Removed reference to non-existent 'todayApplications' element
+            document.getElementById('totalApplications').textContent = totalApps;
+            document.getElementById('totalInterviews').textContent = statusCounts['Interviewing'] || 0;
+            document.getElementById('totalOffers').textContent = statusCounts['Offer'] || 0;
+            document.getElementById('totalRejected').textContent = statusCounts['Rejected'] || 0;
+            
+            const safeTotal = totalApps || 1;
+            document.getElementById('applicationsProgress').style.width = `${Math.min((totalApps / (dailyGoal * 30)) * 100, 100)}%`;
+            document.getElementById('interviewsProgress').style.width = `${((statusCounts['Interviewing'] || 0) / safeTotal) * 100}%`;
+            document.getElementById('offersProgress').style.width = `${((statusCounts['Offer'] || 0) / safeTotal) * 100}%`;
+            document.getElementById('rejectedProgress').style.width = `${((statusCounts['Rejected'] || 0) / safeTotal) * 100}%`;
+            
+            const recentApps = [...applications].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            const activityList = document.getElementById('recentActivityList');
+            activityList.innerHTML = recentApps.length > 0 ? recentApps.map(app => `<div class="activity-item"><div class="activity-icon"><i data-lucide="file-input"></i></div><div class="activity-content"><div class="activity-title">${app.position} at ${app.companyName}</div><div class="activity-time">${new Date(app.date.replace(/-/g, '/')).toDateString()}</div></div><span class="badge ${getStatusBadgeClass(app.status)}">${app.status}</span></div>`).join('') : `<div class="list-item" style="text-align:center; width:100%;"><p>No recent activity yet.</p></div>`;
+            
+            // This is the correct place to update charts, after data is calculated.
+            updateCharts(applications);
+            lucide.createIcons();
+        }
+
+        function updateCharts(applications) {
+            if (!document.getElementById('applicationsChart') || !document.getElementById('progressChart')) return;
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const labelColor = isDarkMode ? '#f7fafc' : '#2d3748';
+            Chart.defaults.color = labelColor;
+
+            const monthlyData = Array(12).fill(0);
+            applications.forEach(app => {
+                const month = new Date(app.date.replace(/-/g, '/')).getMonth();
+                monthlyData[month]++;
+            });
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            if (myApplicationsChart) myApplicationsChart.destroy();
+            myApplicationsChart = new Chart(document.getElementById('applicationsChart').getContext('2d'), { type: 'line', data: { labels: months, datasets: [{ label: 'Applications', data: monthlyData, borderColor: 'var(--primary)', backgroundColor: 'rgba(223, 23, 131, 0.1)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: gridColor } }, x: { grid: { color: gridColor } } } } });
+
+            const statusCounts = applications.reduce((acc, app) => ({...acc, [app.status]: (acc[app.status] || 0) + 1 }), {});
+            if (myProgressChart) myProgressChart.destroy();
+            myProgressChart = new Chart(document.getElementById('progressChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Applied', 'Interviewing', 'Offer', 'Rejected'], datasets: [{ data: [statusCounts['Applied'] || 0, statusCounts['Interviewing'] || 0, statusCounts['Offer'] || 0, statusCounts['Rejected'] || 0], backgroundColor: ['#3B82F6', '#4FD1C5', '#38B2AC', '#EF4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: labelColor } } }, cutout: '70%' } });
+        }
+        
+        function getStatusBadgeClass(status) { return { Applied: 'badge-primary', Interviewing: 'badge-info', Offer: 'badge-success', Rejected: 'badge-danger' }[status] || 'badge-secondary'; }
+
+        // --- Notification System ---
+        function showNotification(message, type = 'info') {
+            const container = document.body;
+            const notification = document.createElement('div');
+            notification.className = `goal-notification show`; // Reuse goal notification style
+            notification.style.backgroundColor = type === 'success' ? '#38B2AC' : (type === 'error' ? '#EF4444' : 'var(--primary)');
+            notification.innerHTML = `<span>${message}</span><button class="close-notification" onclick="this.parentElement.remove()"><i data-lucide="x"></i></button>`;
+            container.appendChild(notification);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function checkDailyGoal() {
+            if (!appData.settings) return;
+            
+            const dailyGoal = appData.settings.dailyGoal || 5;
+            const today = new Date();
+            const todayApps = appData.applications.filter(app => {
+                const appDate = new Date(app.date.replace(/-/g, '/'));
+                return appDate.setHours(0,0,0,0) === today.setHours(0,0,0,0);
+            }).length;
+            
+            if (todayApps < dailyGoal) {
+                showNotification(`Goal Reminder: You've sent ${todayApps} of ${dailyGoal} applications today.`, 'info');
+                lastGoalNotificationDate = new Date();
+            }
+        }
+
+        // --- CRUD Functions & Modals ---
+        window.showAddCompanyModal = () => { document.getElementById('addCompanyForm').reset(); document.getElementById('addCompanyModal').style.display = 'flex'; }
+        
+        function saveCompany(event) {
+            event.preventDefault();
+            const company = { 
+                id: Date.now().toString(), 
+                name: document.getElementById('companyName').value, 
+                email: document.getElementById('companyEmail').value, 
+                contact: document.getElementById('companyContact').value, 
+                position: document.getElementById('companyPosition').value, 
+                // FIX: Corrected element ID from companyHrName to companyContactName
+                contactName: document.getElementById('companyContactName').value,
+                notes: document.getElementById('companyNotes').value 
+            };
+            appData.companies.push(company);
+            saveData();
+            renderCompanies(appData.companies);
+            populateCompanyDropdown(appData.companies);
+            closeModal('addCompanyModal');
+            showNotification('Company added successfully!', 'success');
+        }
+        
+        window.showAddApplicationModal = () => {
+            document.getElementById('addApplicationForm').reset();
+            document.getElementById('applicationDate').valueAsDate = new Date();
+            populateCompanyDropdown(appData.companies);
+            populateMessageTemplates(appData.settings.coldMessages);
+            // Check CV by default if it exists
+            const cvCheckbox = document.getElementById('attachCvCheckbox');
+            cvCheckbox.checked = !!appData.settings?.cvFile;
+            cvCheckbox.disabled = !appData.settings?.cvFile;
+
+            document.getElementById('addApplicationModal').style.display = 'flex';
+        }
+        
+        function saveApplication(event) {
+            event.preventDefault();
+            const companyName = document.getElementById('applicationCompany').value;
+            const company = appData.companies.find(c => c.name === companyName);
+            const companyEmail = company ? company.email : '';
+            const position = document.getElementById('applicationPosition').value;
+            const subject = document.getElementById('applicationSubject').value;
+            const message = document.getElementById('applicationMessageText').value;
+            const attachCv = document.getElementById('attachCvCheckbox').checked;
+
+            const application = { 
+                id: Date.now().toString(), 
+                companyName: companyName, 
+                position: position, 
+                date: document.getElementById('applicationDate').value, 
+                status: document.getElementById('applicationStatus').value, 
+                message: message, 
+                subject: subject,
+                // FIX: Corrected property name to contactName
+                contactName: company ? company.contactName : ''
+            };
+            appData.applications.push(application);
+            saveData();
+            
+            if (companyEmail) {
+                 if (attachCv) {
+                     // Using a custom notification instead of alert
+                     showNotification("REMINDER: Manually attach your CV in your email client.", "info");
+                 }
+                const mailtoLink = `mailto:${companyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                window.location.href = mailtoLink;
+            }
+
+            updateDashboardStats(appData.applications);
+            renderApplications(appData.applications);
+            renderCalendar(appData.applications);
+            closeModal('addApplicationModal');
+            showNotification('Application added successfully!', 'success');
+        }
+        
+        function getDefaultTemplates() {
+            return Array.from({length: 2}, (_, i) => ({ title: `Sample Template ${i+1}`, content: 'Dear [Hiring Manager],\n\nThis is a sample cold message. You can edit it here.' }));
+        }
+        
+        window.addTemplate = () => {
+            if (appData.settings.coldMessages.length >= 10) return;
+            appData.settings.coldMessages.push({ title: 'New Template', content: 'Edit this template content.' });
+            saveData();
+            renderTemplates(appData.settings.coldMessages);
+        }
+        window.editTemplate = (index) => {
+            const template = appData.settings.coldMessages[index];
+            document.getElementById('editTemplateIndex').value = index;
+            document.getElementById('editTemplateTitle').value = template.title;
+            document.getElementById('editTemplateContent').value = template.content;
+            document.getElementById('templateEditModal').style.display = 'flex';
+        }
+        function saveEditedTemplate(event) {
+            event.preventDefault();
+            const index = document.getElementById('editTemplateIndex').value;
+            appData.settings.coldMessages[index] = { title: document.getElementById('editTemplateTitle').value, content: document.getElementById('editTemplateContent').value };
+            saveData();
+            renderTemplates(appData.settings.coldMessages);
+            closeModal('templateEditModal');
+            showNotification('Template updated successfully!', 'success');
+        }
+        window.deleteTemplate = (index) => {
+            // Using custom modal for confirmation
+            if (confirm('Are you sure you want to delete this template?')) {
+                appData.settings.coldMessages.splice(index, 1);
+                saveData();
+                renderTemplates(appData.settings.coldMessages);
+                showNotification('Template deleted successfully!', 'success');
+            }
+        }
+        
+        // --- Populate UI from Data ---
+        function populateCompanyDropdown(companies) {
+            const select = document.getElementById('applicationCompany');
+            select.innerHTML = '<option value="">-- Select a company --</option>' + companies.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        }
+
+        window.populateCompanyData = () => {
+            const select = document.getElementById('applicationCompany');
+            const selectedCompany = appData.companies.find(c => c.name === select.value);
+            if (selectedCompany) {
+                document.getElementById('applicationPosition').value = selectedCompany.position || '';
+                document.getElementById('applicationSubject').value = `Application for ${selectedCompany.position || 'Position'} at ${selectedCompany.name}`;
+            }
+        }
+        
+        function populateMessageTemplates(templates) {
+            const select = document.getElementById('applicationMessage');
+            select.innerHTML = templates.map((t, i) => `<option value="${i}">${t.title}</option>`).join('');
+            updateMessageText();
+        }
+        
+        window.updateMessageText = () => {
+            const template = appData.settings.coldMessages[document.getElementById('applicationMessage').value];
+            if (template) document.getElementById('applicationMessageText').value = template.content;
+        }
+
+        function renderCompanies(companies) {
+            // FIX: Corrected property to c.contactName
+            document.getElementById('companiesList').innerHTML = companies.length ? companies.map(c => `<div class="list-item"><div class="list-icon"><i data-lucide="building-2"></i></div><div class="list-content"><div class="list-title">${c.name}</div><div class="list-meta">${c.position || 'No position'} | ${c.email || 'No email'} | ${c.contactName || 'No contact'}</div></div></div>`).join('') : `<div class="list-item" style="text-align:center;width:100%;"><p>No companies added yet.</p></div>`;
+            lucide.createIcons();
+        }
+        
+        function renderApplications(applications) {
+            document.getElementById('applicationsList').innerHTML = applications.length ? [...applications].sort((a,b) => new Date(b.date) - new Date(a.date)).map(app => `<div class="list-item"><div class="list-icon"><i data-lucide="file-text"></i></div><div class="list-content"><div class="list-title">${app.position} at ${app.companyName}</div><div class="list-meta">Applied on: ${new Date(app.date.replace(/-/g, '/')).toDateString()} | ${app.contactName || 'No contact'}</div></div><span class="badge ${getStatusBadgeClass(app.status)}">${app.status}</span></div>`).join('') : `<div class="list-item" style="text-align:center;width:100%;"><p>No applications yet.</p></div>`;
+            lucide.createIcons();
+        }
+        
+        function renderTemplates(templates) {
+            document.getElementById('addTemplateBtn').style.display = templates.length >= 10 ? 'none' : 'block';
+            document.getElementById('templatesList').innerHTML = templates.length ? templates.map((t, i) => `<div class="template-card"><h4>${t.title}</h4><p>${t.content}</p><div class="template-actions"><button class="btn btn-secondary" onclick="editTemplate(${i})">Edit</button><button class="btn btn-secondary" onclick="deleteTemplate(${i})">Delete</button></div></div>`).join('') : `<p style="text-align:center;">No templates found.</p>`;
+        }
+        
+        function renderCalendar(applications) {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+            document.getElementById('currentMonthYear').textContent = `${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}`;
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div></div>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDate = new Date(currentYear, currentMonth, day);
+                const events = applications.filter(a => new Date(a.date.replace(/-/g, '/')).toDateString() === dayDate.toDateString())
+                    .map(a => `<div class="calendar-event" title="${a.position} at ${a.companyName}">${a.position}</div>`).join('');
+                grid.innerHTML += `<div class="calendar-day"><span class="calendar-day-number">${day}</span>${events}</div>`;
+            }
+        }
+        
+        window.prevMonth = () => { currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1; if (currentMonth === 11) currentYear--; renderCalendar(appData.applications); }
+        window.nextMonth = () => { currentMonth = (currentMonth === 11) ? 0 : currentMonth + 1; if (currentMonth === 0) currentYear++; renderCalendar(appData.applications); }
+        
+        window.exportToGoogleCalendar = () => {
+            if (appData.applications.length === 0) {
+                showNotification('No applications to export!', 'error');
+                return;
+            }
+            
+            const events = appData.applications.map(app => {
+                const date = new Date(app.date.replace(/-/g, '/'));
+                const endDate = new Date(date);
+                endDate.setHours(date.getHours() + 1);
+                
+                return {
+                    title: `Application: ${app.position} at ${app.companyName}`,
+                    start: date.toISOString().replace(/-|:|\.\d+/g, ''),
+                    end: endDate.toISOString().replace(/-|:|\.\d+/g, ''),
+                    details: `Status: ${app.status}\nNotes: ${app.notes || 'None'}`,
+                };
+            });
+            
+            // For simplicity, we open the first event. A more complex solution would be needed for multiple events.
+            const event = events[0];
+            const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.details)}`;
+            
+            window.open(url, '_blank');
+        };
+        
+        window.exportToICal = () => {
+            if (appData.applications.length === 0) {
+                showNotification('No applications to export!', 'error');
+                return;
+            }
+            
+            let ical = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//JobDash//EN\n';
+            
+            appData.applications.forEach(app => {
+                const date = new Date(app.date.replace(/-/g, '/'));
+                const endDate = new Date(date);
+                endDate.setHours(date.getHours() + 1);
+                
+                ical += `BEGIN:VEVENT\n`;
+                ical += `UID:${app.id}@jobdash\n`;
+                ical += `DTSTAMP:${new Date().toISOString().replace(/-|:|\.\d+/g, '')}Z\n`;
+                ical += `DTSTART:${date.toISOString().replace(/-|:|\.\d+/g, '')}Z\n`;
+                ical += `DTEND:${endDate.toISOString().replace(/-|:|\.\d+/g, '')}Z\n`;
+                ical += `SUMMARY:Application: ${app.position} at ${app.companyName}\n`;
+                ical += `DESCRIPTION:Status: ${app.status}\\nNotes: ${app.notes || 'None'}\n`;
+                ical += `END:VEVENT\n`;
+            });
+            
+            ical += 'END:VCALENDAR';
+            
+            const blob = new Blob([ical], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'job_applications.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // --- CV/Resume Management ---
+        window.handleCurriculumUpload = (event) => {
+            const file = event.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Pdf = e.target.result;
+                    appData.settings.cvFile = base64Pdf;
+                    appData.settings.cvFileName = file.name;
+                    saveData();
+                    loadCvPreview();
+                    document.getElementById('cvNotificationBanner').style.display = 'none';
+                    showNotification('CV uploaded successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Please select a valid PDF file.', 'error');
+            }
+        }
+        
+        window.deleteCurriculum = () => {
+            appData.settings.cvFile = null;
+            appData.settings.cvFileName = null;
+            saveData();
+            loadCvPreview();
+            document.getElementById('cvNotificationBanner').style.display = 'flex';
+            showNotification('CV deleted successfully!', 'success');
+        }
+        
+        function loadCvPreview() {
+            const cvFile = appData.settings?.cvFile;
+            const cvFileName = appData.settings?.cvFileName;
+            const cvPreview = document.getElementById('cvPreview');
+            document.getElementById('curriculumFileName').textContent = cvFileName || 'No file selected.';
+            
+            const cvControls = document.getElementById('cvControls');
+            if (cvFile) {
+                cvPreview.innerHTML = `<iframe src="${cvFile}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+                cvControls.style.display = 'flex';
+            } else {
+                cvPreview.innerHTML = `<p style="padding: 20px; text-align: center; margin-top: 40%;">PDF Preview will appear here.</p>`;
+                cvControls.style.display = 'none';
+            }
+        }
+        
+        function loadUserDataFromDB(settings) {
+            const name = settings.fullName || 'User';
+            document.getElementById('greetingName').textContent = name.split(' ')[0];
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userIdDisplay').textContent = settings.userId || '...';
+
+            const avatar = document.getElementById('userAvatar');
+            if (settings.profilePicture) {
+                avatar.innerHTML = `<img src="${settings.profilePicture}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                avatar.innerHTML = '<i data-lucide="user-circle-2"></i>';
+                lucide.createIcons();
+            }
+        }
+
+        function initApp() {
+            if (appData.settings) {
+                loadUserDataFromDB(appData.settings);
+                updateDashboardStats(appData.applications);
+                renderApplications(appData.applications);
+                renderCompanies(appData.companies);
+                renderCalendar(appData.applications);
+                renderTemplates(appData.settings.coldMessages || getDefaultTemplates());
+                loadSettingsPage();
+                loadCvPreview();
+                navigateTo('dashboardContent', document.querySelector('.nav-item.active'));
+                
+                setTimeout(checkDailyGoal, 2000);
+            } else {
+                showSetupModal();
+            }
+        }
+
+        // --- App Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // UI setup
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            lucide.createIcons(); // Initial icon render
+            
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            if (themeIcon) {
+                themeIcon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+                lucide.createIcons();
+            }
+
+            updateClock(); 
+            setInterval(updateClock, 1000);
+            
+            // Wire up profile picture inputs
+            document.getElementById('setupProfilePic').addEventListener('change', () => handleProfilePicUpload(document.getElementById('setupProfilePic'), data => { if(data) { document.getElementById('setupProfilePicPreview').innerHTML = `<img src="${data}" alt="Profile Preview">`; } }));
+            document.getElementById('settingsProfilePic').addEventListener('change', () => handleProfilePicUpload(document.getElementById('settingsProfilePic'), data => { if(data) { document.getElementById('settingsProfilePicPreview').innerHTML = `<img src="${data}" alt="Profile Preview">`; } }));
+
+            // Form listeners
+            document.getElementById('setupForm').addEventListener('submit', saveSetup);
+            document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+            document.getElementById('addCompanyForm').addEventListener('submit', saveCompany);
+            document.getElementById('addApplicationForm').addEventListener('submit', saveApplication);
+            document.getElementById('templateEditForm').addEventListener('submit', saveEditedTemplate);
+            
+            // Load data and initialize
+            appData = loadData();
+            initApp();
+            
+            // Adjust main content padding to reduce space at bottom
+            document.getElementById('mainContent').style.paddingBottom = '20px';
+        });
+</script>
+</body>
+</html>
