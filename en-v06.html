@@ -1054,6 +1054,9 @@
                     <div class="card"><div class="card-header"><div class="card-title">Offers</div><i data-lucide="handshake" style="color: var(--accent);"></i></div><div class="card-value" id="totalOffers">0</div><div class="card-text">Pending acceptance</div><div class="progress-bar"><div class="progress-fill" id="offersProgress" style="background-color: var(--accent);"></div></div></div>
                     <div class="card"><div class="card-header"><div class="card-title">Rejected</div><i data-lucide="x-circle" style="color: #EF4444;"></i></div><div class="card-value" id="totalRejected">0</div><div class="card-text">Learning opportunities</div><div class="progress-bar"><div class="progress-fill" id="rejectedProgress" style="background-color: #EF4444;"></div></div></div>
                 </div>
+              
+                
+                
                 <div class="charts-section"><div class="chart-container"><canvas id="applicationsChart"></canvas></div><div class="chart-container"><canvas id="progressChart"></canvas></div></div>
                 <div class="activity-section"><div class="card-header"><div class="card-title">Recent Activity</div><i data-lucide="bell" style="color: var(--primary);"></i></div><div id="recentActivityList"><div class="list-item"><div class="list-content" style="text-align: center; width: 100%;">No recent activity yet.</div></div></div></div>
                 <!-- Timeline Section -->
@@ -1061,32 +1064,34 @@
                     <div class="timeline-container">
                         <div class="timeline-step">
                             <div class="timeline-icon"><i data-lucide="upload-cloud"></i></div>
-                            <div class="timeline-text">Upload CV</div>
+                            <div class="timeline-text">📄 Upload CV</div>
                         </div>
                         <div class="timeline-step">
                             <div class="timeline-icon"><i data-lucide="search"></i></div>
-                            <div class="timeline-text">Find Employer</div>
+                            <div class="timeline-text">🏢 Find Employer</div>
                         </div>
                         <div class="timeline-step">
                             <div class="timeline-icon"><i data-lucide="building-2"></i></div>
-                            <div class="timeline-text">Register Company</div>
+                            <div class="timeline-text">✏️ Register Company</div>
                         </div>
                         <div class="timeline-step">
                             <div class="timeline-icon"><i data-lucide="file-text"></i></div>
-                            <div class="timeline-text">Apply</div>
+                            <div class="timeline-text">💌 Send Application</div>
                         </div>
                         <div class="timeline-step">
                             <div class="timeline-icon"><i data-lucide="message-square"></i></div>
-                            <div class="timeline-text">Follow-up</div>
+                            <div class="timeline-text">📬 Follow-up</div>
                         </div>
                         <div class="timeline-step">
                             <div class="timeline-icon"><i data-lucide="repeat"></i></div>
-                            <div class="timeline-text">Repeat</div>
+                            <div class="timeline-text">♻️ Repeat Process</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        
         
         <div id="applicationsContent" class="page-content"><div class="page-header"><h2>My Applications</h2><button class="add-button" onclick="showAddApplicationModal()"><i data-lucide="plus"></i> Add New</button></div><div class="list-section"><div id="applicationsList" class="list-container"><div class="list-item"><div class="list-content" style="text-align: center; width: 100%;">Loading applications...</div></div></div></div></div>
         
@@ -1116,6 +1121,10 @@
                 </div>
             </div>
         </div>
+
+
+
+        
         
         <div id="templatesContent" class="page-content"><div class="page-header"><h2>Application Templates</h2><button id="addTemplateBtn" class="add-button" onclick="addTemplate()"><i data-lucide="plus"></i> Add New</button></div><div class="list-section"><p style="margin-bottom: 20px;">Edit the cold message templates to use in your applications. You can have up to 10 templates.</p><div id="templatesList" class="card-container"></div></div></div>
         
@@ -1144,6 +1153,11 @@
                 </div>
             </div>
         </div>
+
+
+
+
+
         
         <div id="settingsContent" class="page-content">
             <div class="page-header"><h2>User Settings</h2></div>
@@ -1194,11 +1208,16 @@
             <iframe id="contentIframe" style="width:100%; height:90%; border:0; border-radius: 10px;" sandbox="allow-scripts allow-same-origin"></iframe>
         </div>
 
+
+        
+
         <!-- Footer -->
         <div class="legal-links">
-            <a href="#" onclick="navigateTo('iframePage', null, 'https://example.com/privacy')" class="legal-link">Privacy Policy</a>
-            <span style="color: var(--text); margin: 0 10px;">|</span>
-            <a href="#" onclick="navigateTo('iframePage', null, 'https://example.com/terms')" class="legal-link">Terms of Use</a>
+              <a href="#" onclick="navigateTo('iframePage', null, 'https://bebelldigitalsolutions.com')" class="legal-link">About Us  </a>
+            <span style="color: var(--text); margin: 0 10px;">•</span>
+            <a href="#" onclick="navigateTo('iframePage', null, 'https://example.com/privacy')" class="legal-link">  Privacy Policy  </a>
+            <span style="color: var(--text); margin: 0 10px;">•</span>
+            <a href="#" onclick="navigateTo('iframePage', null, 'https://example.com/terms')" class="legal-link">  Terms of Use</a>
         </div>
 
         <div class="social-links">
