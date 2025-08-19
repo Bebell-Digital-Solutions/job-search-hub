@@ -266,15 +266,56 @@ html {
         
         
         
-        
-        
-        
-        /* Charts Section */
-        .charts-section { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px; }
-        .chart-container { background-color: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: var(--shadow); height: 350px; }
-        
-        
-        
+      /* Charts Section */
+.charts-section {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile-first single column */
+    gap: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* Prevents any overflow issues */
+}
+
+.chart-container {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    height: auto; /* Flexible height */
+    min-height: 300px; /* Minimum height */
+    width: 100%;
+    overflow: hidden; /* Ensures content stays within bounds */
+}
+
+/* Medium screens (tablets) and up */
+@media (min-width: 768px) {
+    .charts-section {
+        grid-template-columns: 1fr 1fr; /* Equal columns on medium screens */
+        gap: 25px;
+    }
+}
+
+/* Large screens (desktops) and up */
+@media (min-width: 1024px) {
+    .charts-section {
+        grid-template-columns: 2fr 1fr; /* Wider left column on large screens */
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+    
+    .chart-container {
+        padding: 25px;
+        height: 350px; /* Fixed height only on large screens */
+    }
+}
+
+/* Extra safety to prevent overflow */
+.chart-container canvas,
+.chart-container svg {
+    max-width: 100%;
+    height: auto !important; /* Override any inline chart library styles */
+}
         
         
         
@@ -493,7 +534,7 @@ padding-top: 0px;
 
 .social-link:hover {
     color: var(--text);
-    background: #0d1116;
+    background: #1e2837;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
