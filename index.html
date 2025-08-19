@@ -449,6 +449,13 @@ padding-top: 0px;
 
 
 
+.social-links-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto; /* Allows horizontal scrolling if absolutely needed */
+    padding: 10px 0;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
 
 
 .social-links {
@@ -459,13 +466,13 @@ padding-top: 0px;
     margin: 0;
     flex-wrap: wrap;
     padding: 0.25rem;
-    
+    min-width: min-content; /* Prevents unwanted shrinking */
 }
 
 .social-link {
     color: white;
     text-decoration: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.25rem;
     padding: 0.35rem 0.75rem;
@@ -476,6 +483,9 @@ padding-top: 0px;
     transition: all 0.3s ease;
     font-size: 0.85rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap; /* Prevents text from breaking */
+    min-width: max-content; /* Ensures minimum width based on content */
+
 }
 
 
