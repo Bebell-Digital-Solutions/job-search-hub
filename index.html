@@ -197,7 +197,7 @@
         
         /* Main Content */
         .main-content {
-            flex: 1; margin-left: 250px; padding: 40px; transition: margin-left 0.3s ease; background-color: var(--bg);
+            flex: 1; margin-left: 250px; padding: 40px; padding-bottom: 10px; transition: margin-left 0.3s ease; background-color: var(--bg);
         }
         .main-content.sidebar-collapsed { margin-left: 70px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
@@ -346,20 +346,10 @@
        
        
        
-       
-       
-       
-       
-       
-       
        /* Page Styles */
         .page-content { display: none; min-height: 100%; flex-direction: column; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .page-header h2 { font-size: 28px; font-weight: 600; }
-        
-        
-        
-        
         
         
         
@@ -381,12 +371,7 @@
         .template-actions .btn { font-size: 12px; padding: 8px 12px; }
 
         
-        
-        
-        
-        
-        
-        
+
         
         
         /* Calendar */
@@ -403,11 +388,7 @@
         .dark-mode .calendar-event { color: var(--text); }
         .calendar-day-number { font-weight: bold; font-size: 1.2em; position: absolute; top: 5px; left: 5px; }
         
-        
-        
-        
-        
-        
+  
         
         
         /* Profile Picture Upload */
@@ -417,13 +398,6 @@
         .profile-pic-preview img { width: 100%; height: 100%; object-fit: cover; }
         .profile-pic-preview i { color: var(--primary); }
         
-       
-       
-       
-       
-       
-       
-       
        
        
        /* Notification Banner */
@@ -440,7 +414,7 @@
 
   /* ===== FOOTER ===== */
 .footer {
-padding-top: 30px;
+padding-top: 0px;
     background: transparent;
     text-align: center;
         color: var(--text-light);
@@ -758,7 +732,7 @@ padding: 20px;
         </div>
 
         <div id="iframePage" class="page-content" style="height: calc(100vh - 150px); padding: 0;">
-            <iframe id="contentIframe" style="width:100%; height:100%; border:0; border-radius: 10px;" sandbox="allow-scripts allow-same-origin"></iframe>
+            <iframe id="contentIframe" style="width:100%; height:90%; border:0; border-radius: 10px;" sandbox="allow-scripts allow-same-origin"></iframe>
         </div>
 
 
