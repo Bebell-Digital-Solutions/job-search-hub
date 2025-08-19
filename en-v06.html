@@ -1213,8 +1213,7 @@
 
         <!-- Footer -->
         <div class="legal-links">
-              <a href="#" onclick="navigateTo('iframePage', null, 'https://bebelldigitalsolutions.com')" class="legal-link">About Us  </a>
-            <span style="color: var(--text); margin: 0 10px;">•</span>
+<a href="https://bebelldigitalsolutions.com" target="_blank" onclick="event.preventDefault(); window.open('https://bebelldigitalsolutions.com', '_blank');" class="btn">            <span style="color: var(--text); margin: 0 10px;">•</span>
             <a href="#" onclick="navigateTo('iframePage', null, 'https://example.com/privacy')" class="legal-link">  Privacy Policy  </a>
             <span style="color: var(--text); margin: 0 10px;">•</span>
             <a href="#" onclick="navigateTo('iframePage', null, 'https://example.com/terms')" class="legal-link">  Terms of Use</a>
@@ -1310,6 +1309,10 @@
         </div>
     </div>
 
+
+
+
+    
     <!-- Add Interview Modal -->
     <div class="modal" id="addInterviewModal">
         <div class="modal-content">
@@ -1338,20 +1341,27 @@
         </div>
     </div>
 
+
+
+
+
+
+
+    
     <!-- Floating Action Button -->
     <div class="fab-container" id="fabContainer">
         <div class="fab-options" id="fabOptions">
             <a href="#" class="fab-option" onclick="showAddCompanyModal()">
                 <i data-lucide="building-2"></i>
-                <span>Company</span>
+                <span>Add New Opportunity</span>
             </a>
             <a href="#" class="fab-option" onclick="showAddApplicationModal()">
                 <i data-lucide="file-text"></i>
-                <span>Application</span>
+                <span>Add New Application</span>
             </a>
             <a href="#" class="fab-option" onclick="showAddInterviewModal()">
                 <i data-lucide="calendar-plus"></i>
-                <span>Interview</span>
+                <span>Add New Interview</span>
             </a>
         </div>
         <button class="fab" id="fab">
@@ -1359,6 +1369,14 @@
         </button>
     </div>
 
+
+
+
+
+
+
+
+    
 
 <script>
         // --- Global State & Config ---
