@@ -11,7 +11,27 @@
   <!-- Favicon -->
   <link rel="icon" href="https://bucket.mlcdn.com/a/3336/3336910/images/34fdb3a11cc4d64885c973054e27c8d9bc15f5a1.png">     
     
+
+    
+    
+    
+    
     <style>
+
+
+/* Add this at the very top of your CSS */
+html {
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevents horizontal scrolling */
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+
+
+
+        
         :root {
             --primary: #DF1783;
             --primary-light: #f8a4d4;
@@ -507,33 +527,88 @@ padding: 20px;
   
         
 
+/* Improved responsive breakpoints */
+@media (max-width: 1200px) { 
+    .dashboard-cards { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 20px;
+    } 
+    .charts-section {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 992px) { 
+    .charts-section { 
+        grid-template-columns: 1fr; 
+    } 
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 0; /* Remove default body padding */
+    }
+    .main-content { 
+        padding: 15px; 
+        width: 100%;
+        max-width: 100%;
+    }
+    .header { 
+        flex-direction: column; 
+        align-items: stretch; /* Changed from flex-start to stretch */
+        gap: 15px; 
+        padding: 15px;
+    }
+    .header-right { 
+        width: 100%; 
+        flex-direction: column; 
+        gap: 15px; 
+    }
+    .search-bar, .live-clock { 
+        width: 100%; 
+        max-width: 100%;
+    }
+    .dashboard-cards { 
+        grid-template-columns: 1fr; 
+    }
+    /* Add this to ensure containers don't overflow */
+    .card, .chart-container, .activity-section, .list-section {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) { 
+    .modal-content { 
+        max-width: 95%; 
+        padding: 20px; 
+        margin: 20px auto; /* Center the modal */
+    }
+    /* Add mobile-specific adjustments */
+    .card {
+        padding: 15px;
+    }
+    .activity-item, .list-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .activity-icon, .list-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+/* Add this to prevent any element from causing overflow */
+.container, .main-content, header, section {
+    max-width: 100%;
+    overflow-x: hidden;
+}
 
 
 
-
         
         
-        
-        
-        
-        /* Responsive */
-        @media (max-width: 1200px) { .dashboard-cards { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 992px) { .charts-section { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) {
-            .main-content { padding: 20px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .header-right { width: 100%; flex-direction: column; gap: 15px; }
-            .search-bar, .live-clock { width: 100%; }
-            .dashboard-cards { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 576px) { .modal-content { max-width: 95%; padding: 25px; } }
-    
-    
-    
-    
-    
-    
-    
+       
     
     
     
