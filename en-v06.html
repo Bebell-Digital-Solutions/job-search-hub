@@ -479,13 +479,15 @@
         /* Notification Banner */
         .notification-banner {
             display: none; padding: 15px; margin-bottom: 20px; border-radius: 8px;
-            background-color: #df1783; border: 1px solid #fbd38d; color: #b7791f;
+            background-color: #df1783; border: 1px solid #ca188b; color: #fff;
             align-items: center; justify-content: space-between;
         }
         
         .dark-mode .notification-banner {
-             background-color: #1a202c; border-color: #a0742f; color: #fbd38d;
+             background-color: #df1783; border-color: #ca188b; color: #fff;
         }
+
+        
         
         /* Goal Notification */
         .goal-notification {
@@ -506,11 +508,16 @@
             display: block;
             animation: slideIn 0.5s forwards;
         }
+
+        
         
         @keyframes slideIn {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
         }
+
+
+        
         
         .goal-notification .close-notification {
             position: absolute;
